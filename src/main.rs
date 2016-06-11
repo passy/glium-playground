@@ -1,3 +1,9 @@
+#[macro_use]
+
+extern crate glium;
+
 fn main() {
-    println!("Hello, world!");
+    use glium::DisplayBuild;
+
+    let display = glium::glutin::WindowBuilder::new().build_glium().unwrap();
 }
