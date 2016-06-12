@@ -62,12 +62,10 @@ fn draw(state: State,
 
         in vec2 position;
 
-        uniform float rot;
+        uniform mat4 matrix;
 
         void main() {
-            vec2 pos = position;
-            pos.x += rot;
-            gl_Position = vec4(pos, 0.0, 1.0);
+            gl_Position = matrix * vec4(position, 0.0, 1.0);
         }
     "#;
 
@@ -84,13 +82,20 @@ fn draw(state: State,
     let program =
         glium::Program::from_source(display, vertex_shader_src, fragment_shader_src, None).unwrap();
 
+    let uniforms = uniform! {
+        matrix: [ [1.0, 0.0, 0.0, 0.0],
+                  [0.0, 1.0, 0.0, 0.0],
+                  [0.0, 0.0, 1.0, 0.0],
+                  [rot, 0.0, 0.0, 1.0f32],
+                ]
+    };
 
     let mut target = display.draw();
     target.clear_color(251.0 / 255.0, 34.0 / 255.0, 112.0 / 255.0, 1.0);
     target.draw(vertex_buffer,
               &indices,
               &program,
-              &uniform! { rot: rot },
+              &uniforms,
               &Default::default())
         .unwrap();
 
