@@ -62,8 +62,12 @@ fn draw(state: State,
 
         in vec2 position;
 
+        uniform float rot;
+
         void main() {
-            gl_Position = vec4(position, 0.0, 1.0);
+            vec2 pos = position;
+            pos.x += rot;
+            gl_Position = vec4(pos, 0.0, 1.0);
         }
     "#;
 
@@ -86,7 +90,7 @@ fn draw(state: State,
     target.draw(vertex_buffer,
               &indices,
               &program,
-              &glium::uniforms::EmptyUniforms,
+              &uniform! { rot: rot },
               &Default::default())
         .unwrap();
 
