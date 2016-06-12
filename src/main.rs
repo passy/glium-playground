@@ -7,15 +7,21 @@ struct Vertex {
     position: [f32; 2],
 }
 
+struct State {
+    rot: f32,
+}
+
 implement_vertex!(Vertex, position);
 
 fn main() {
     use glium::DisplayBuild;
 
     let display = glium::glutin::WindowBuilder::new().build_glium().unwrap();
+    let mut state = State { rot: -0.5 };
 
     loop {
-        let d = draw(&display);
+        let (state_, d) = draw(state, &display);
+        state = state_;
         d.unwrap();
 
         for ev in display.poll_events() {
@@ -27,13 +33,23 @@ fn main() {
     }
 }
 
-fn draw(display: &glium::backend::glutin_backend::GlutinFacade)
-        -> Result<(), glium::SwapBuffersError> {
+fn draw(state: State,
+        display: &glium::backend::glutin_backend::GlutinFacade)
+        -> (State, Result<(), glium::SwapBuffersError>) {
     use glium::Surface;
 
-    let vertex1 = Vertex { position: [-0.5, -0.5] };
-    let vertex2 = Vertex { position: [0.5, -0.25] };
-    let vertex3 = Vertex { position: [0.0, 0.5] };
+    let mut rot = state.rot;
+    rot += 0.0002;
+
+    if rot > 0.5 {
+        rot = -0.5;
+    }
+
+    let state_ = State { rot: rot };
+
+    let vertex1 = Vertex { position: [-0.5 + rot, -0.5] };
+    let vertex2 = Vertex { position: [0.5 + rot, -0.25] };
+    let vertex3 = Vertex { position: [0.0 + rot, 0.5] };
     let shape = vec![vertex1, vertex2, vertex3];
 
     let vertex_buffer = glium::VertexBuffer::new(display, &shape).unwrap();
@@ -73,5 +89,5 @@ fn draw(display: &glium::backend::glutin_backend::GlutinFacade)
               &Default::default())
         .unwrap();
 
-    target.finish()
+    (state_, target.finish())
 }
