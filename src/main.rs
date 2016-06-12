@@ -19,8 +19,15 @@ fn main() {
     let display = glium::glutin::WindowBuilder::new().build_glium().unwrap();
     let mut state = State { rot: -0.5 };
 
+    let vertex1 = Vertex { position: [-0.5, -0.5] };
+    let vertex2 = Vertex { position: [0.5, -0.25] };
+    let vertex3 = Vertex { position: [0.0, 0.5] };
+    let shape = vec![vertex1, vertex2, vertex3];
+
+    let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
+
     loop {
-        let (state_, d) = draw(state, &display);
+        let (state_, d) = draw(state, &vertex_buffer, &display);
         state = state_;
         d.unwrap();
 
@@ -34,6 +41,7 @@ fn main() {
 }
 
 fn draw(state: State,
+        vertex_buffer: &glium::VertexBuffer<Vertex>,
         display: &glium::backend::glutin_backend::GlutinFacade)
         -> (State, Result<(), glium::SwapBuffersError>) {
     use glium::Surface;
@@ -46,13 +54,6 @@ fn draw(state: State,
     }
 
     let state_ = State { rot: rot };
-
-    let vertex1 = Vertex { position: [-0.5 + rot, -0.5] };
-    let vertex2 = Vertex { position: [0.5 + rot, -0.25] };
-    let vertex3 = Vertex { position: [0.0 + rot, 0.5] };
-    let shape = vec![vertex1, vertex2, vertex3];
-
-    let vertex_buffer = glium::VertexBuffer::new(display, &shape).unwrap();
 
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
 
@@ -82,7 +83,7 @@ fn draw(state: State,
 
     let mut target = display.draw();
     target.clear_color(251.0 / 255.0, 34.0 / 255.0, 112.0 / 255.0, 1.0);
-    target.draw(&vertex_buffer,
+    target.draw(vertex_buffer,
               &indices,
               &program,
               &glium::uniforms::EmptyUniforms,
