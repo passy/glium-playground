@@ -83,8 +83,8 @@ fn draw(state: State,
         glium::Program::from_source(display, vertex_shader_src, fragment_shader_src, None).unwrap();
 
     let uniforms = uniform! {
-        matrix: [ [1.0, 0.0, 0.0, 0.0],
-                  [0.0, 1.0, 0.0, 0.0],
+        matrix: [ [rot.cos(), rot.sin(), 0.0, 0.0],
+                  [-rot.sin(), rot.cos(), 0.0, 0.0],
                   [0.0, 0.0, 1.0, 0.0],
                   [rot, 0.0, 0.0, 1.0f32],
                 ]
