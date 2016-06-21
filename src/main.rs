@@ -1,6 +1,7 @@
 #[macro_use]
 
 extern crate glium;
+extern crate image;
 
 #[derive(Copy, Clone)]
 struct Vertex {
@@ -16,6 +17,13 @@ implement_vertex!(Vertex, position);
 fn main() {
     use glium::DisplayBuild;
 
+    let image = image::load(Cursor::new(&include_bytes!("images/bird.png")[..]),
+                            image::PNG)
+        .unwrap()
+        .to_rgba();
+    let image_texture = glium::texture::RawImage2d::from_raw_rgba_reversed(image.to_raw(),
+                                                                           image.dimensions());
+
     let display = glium::glutin::WindowBuilder::new().build_glium().unwrap();
     let mut state = State { rot: -0.5 };
 
@@ -25,6 +33,7 @@ fn main() {
     let shape = vec![vertex1, vertex2, vertex3];
 
     let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
+    let texture = glium::texture::Texture2d::new(&display, image).unwrap();
 
     loop {
         let (state_, d) = draw(state, &vertex_buffer, &display);

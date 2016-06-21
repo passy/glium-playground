@@ -5,3 +5,4 @@ authors = ["Pascal Hartig <phartig@rdrei.net>"]
 
 [dependencies]
 glium = "0.13.5"
+image = "0.10.0"
