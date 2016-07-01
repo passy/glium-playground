@@ -20,7 +20,10 @@ fn main() {
     use glium::DisplayBuild;
     use std::io::Cursor;
 
-    let display = glium::glutin::WindowBuilder::new().build_glium().unwrap();
+    let display = glium::glutin::WindowBuilder::new()
+        .with_depth_buffer(24)
+        .build_glium()
+        .unwrap();
     let mut state = State { rot: -0.5 };
 
     let positions = glium::VertexBuffer::new(&display, &teapot::VERTICES).unwrap();
@@ -95,13 +98,18 @@ fn draw(state: State,
         u_light: [-1.0, 0.4, 0.9f32]
     };
 
+    let params = glium::DrawParameters {
+        depth: glium::Depth {
+            test: glium::draw_parameters::DepthTest::IfLess,
+            write: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
     let mut target = display.draw();
-    target.clear_color(251.0 / 255.0, 34.0 / 255.0, 112.0 / 255.0, 1.0);
-    target.draw((positions, normals),
-              indices,
-              &program,
-              &uniforms,
-              &Default::default())
+    target.clear_color_and_depth((0.0, 0.0, 1.0, 1.0), 1.0);
+    target.draw((positions, normals), indices, &program, &uniforms, &params)
         .unwrap();
 
     (state, target.finish())
