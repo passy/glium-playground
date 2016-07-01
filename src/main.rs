@@ -79,8 +79,8 @@ fn draw(state: State,
 
         void main() {
             float brightness = dot(normalize(v_normal), normalize(u_light));
-            vec3 dark_color = vec3(0.6, 0.0, 0.0);
-            vec3 regular_color = vec3(1.0, 0.0, 0.0);
+            vec3 dark_color = vec3(0.7372549019607843, 0.2549019607843137, 0.4352941176470588);
+            vec3 regular_color = vec3(0.9372549019607843, 0.4549019607843137, 0.6352941176470588);
             color = vec4(mix(dark_color, regular_color, brightness), 1.0);
         }
     "#;
@@ -108,7 +108,8 @@ fn draw(state: State,
     };
 
     let mut target = display.draw();
-    target.clear_color_and_depth((0.0, 0.0, 1.0, 1.0), 1.0);
+    target.clear_color_and_depth((0.6509803921568628, 0.9372549019607843, 0.8823529411764706, 1.0),
+                                 1.0);
     target.draw((positions, normals), indices, &program, &uniforms, &params)
         .unwrap();
 
