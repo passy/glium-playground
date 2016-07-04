@@ -51,6 +51,7 @@ fn draw(state: State,
         indices: &glium::IndexBuffer<u16>)
         -> (State, Result<(), glium::SwapBuffersError>) {
     use glium::Surface;
+    use std::f32::consts::PI;
 
     let vertex_shader_src = r#"
         #version 140
@@ -60,11 +61,12 @@ fn draw(state: State,
 
         out vec3 v_normal;
 
+        uniform mat4 perspective;
         uniform mat4 matrix;
 
         void main() {
             v_normal = transpose(inverse(mat3(matrix))) * normal;
-            gl_Position = matrix * vec4(position, 1.0);
+            gl_Position = perspective * matrix * vec4(position, 1.0);
         }
     "#;
 
@@ -86,16 +88,6 @@ fn draw(state: State,
     let program =
         glium::Program::from_source(display, vertex_shader_src, fragment_shader_src, None).unwrap();
 
-    let uniforms = uniform! {
-        matrix: [
-            [0.01, 0.0, 0.0, 0.0],
-            [0.0, 0.01, 0.0, 0.0],
-            [0.0, 0.0, 0.01, 0.0],
-            [0.0, 0.0, 0.5, 1.0f32],
-        ],
-        u_light: [-1.0, 0.4, 0.9f32]
-    };
-
     let params = glium::DrawParameters {
         depth: glium::Depth {
             test: glium::draw_parameters::DepthTest::IfLess,
@@ -106,6 +98,34 @@ fn draw(state: State,
     };
 
     let mut target = display.draw();
+
+    let perspective = {
+        let (w, h) = target.get_dimensions();
+        let aspect_ratio = h as f32 / w as f32;
+
+        let fov: f32 = PI / 3.0;
+        let zfar = 1024.0;
+        let znear = 0.1;
+
+        let f = 1.0 / (fov / 2.0).tan();
+
+        [[f * aspect_ratio, 0.0, 0.0, 0.0],
+         [0.0, f, 0.0, 0.0],
+         [0.0, 0.0, (zfar + znear) / (zfar - znear), 1.0],
+         [0.0, 0.0, -(2.0 * zfar * znear) / (zfar - znear), 0.0]]
+    };
+
+    let uniforms = uniform! {
+        matrix: [
+            [0.01, 0.0, 0.0, 0.0],
+            [0.0, 0.01, 0.0, 0.0],
+            [0.0, 0.0, 0.01, 0.0],
+            [0.0, 0.0, 2.0, 1.0f32],
+        ],
+        u_light: [-1.0, 0.4, 0.9f32],
+        perspective: perspective
+    };
+
     target.clear_color_and_depth((0.6509803921568628, 0.9372549019607843, 0.8823529411764706, 1.0),
                                  1.0);
     target.draw((positions, normals), indices, &program, &uniforms, &params)
