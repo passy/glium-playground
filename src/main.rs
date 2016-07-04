@@ -11,20 +11,18 @@ struct Vertex {
 }
 
 struct State {
-    rot: f32,
 }
 
 implement_vertex!(Vertex, position, tex_coords);
 
 fn main() {
     use glium::DisplayBuild;
-    use std::io::Cursor;
 
     let display = glium::glutin::WindowBuilder::new()
         .with_depth_buffer(24)
         .build_glium()
         .unwrap();
-    let mut state = State { rot: -0.5 };
+    let mut state = State {};
 
     let positions = glium::VertexBuffer::new(&display, &teapot::VERTICES).unwrap();
     let normals = glium::VertexBuffer::new(&display, &teapot::NORMALS).unwrap();
@@ -93,7 +91,7 @@ fn draw(state: State,
             [0.01, 0.0, 0.0, 0.0],
             [0.0, 0.01, 0.0, 0.0],
             [0.0, 0.0, 0.01, 0.0],
-            [0.0, 0.0, 0.0, 1.0f32],
+            [0.0, 0.0, 0.5, 1.0f32],
         ],
         u_light: [-1.0, 0.4, 0.9f32]
     };
